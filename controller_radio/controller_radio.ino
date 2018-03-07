@@ -38,8 +38,8 @@ const int m3_speed_pin = 3;
 const int m3_sign = 1;
 
 //back right
-const int dir_4_pin = 12;
-const int m4_speed_pin = 13;
+const int dir_4_pin = 11;
+const int m4_speed_pin = 12;
 const int m4_sign = 1;
 
 const int COUNTER_MAX = 250;
