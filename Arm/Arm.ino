@@ -128,7 +128,7 @@ void moveLinearAct(int speed_pin, int dir1_pin, int dir2_pin, int dir_sig) {
  }
 }
 
-//0 to 4095 for position
+//0 to 4095 for position, sets to this position
 void MX(int id, int com)
 {
   byte data[8] = {255, 255, id, 5, 3, 30, lowByte(com), highByte(com)};
@@ -136,6 +136,7 @@ void MX(int id, int com)
 }
 
 //0 to 2047 for speed (0 to 1023 CCW (0 stop, 1023 max speed), 1024 to 2047 CW (1024 stop, 2047 max speed))
+//rotates clockwise or counterclockwise
 void AX(int id, int com)
 {
   byte data[8] = {255, 255, id, 5, 3, 32, lowByte(com), highByte(com)};
