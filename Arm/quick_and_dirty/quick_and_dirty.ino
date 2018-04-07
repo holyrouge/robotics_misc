@@ -34,6 +34,10 @@
 #define LEFT_STICK 10 // left stick button
 #define RIGHT_STICK 11 // right stick button
 
+#define SERVO_1_SPEED 50 // speed of servo one(vertical movement of the claw)
+#define SERVO_2_SPEED 100 // speed of servo two(roatation of the claw)
+#define SERVO_3_SPEED 400 // speed of claw closing
+
 /*
  * QUICK AND DIRTY CONTROL SCHEME
  * 
@@ -148,9 +152,9 @@ void loop()
       moveLinearAct(FOREARM_SPEED, FOREARM_DIR1, FOREARM_DIR2, 0);
     }
 
-    continuousRotation(WRIST_PITCH, input_data[SERVO_1]);
-    continuousRotation(WRIST_ROTATION, input_data[SERVO_2]);
-    continuousRotation(HAND_CLOSE, input_data[SERVO_3]);
+    continuousRotationSpeed(WRIST_PITCH, input_data[SERVO_1], SERVO_1_SPEED);
+    continuousRotationSpeed(WRIST_ROTATION, input_data[SERVO_2], SERVO_2_SPEED);
+    continuousRotationSpeed(HAND_CLOSE, input_data[SERVO_3], SERVO_3_SPEED);
       
       
     } else {
@@ -168,6 +172,17 @@ void continuousRotation(int id, int dir_sig) {
     AX(id, CONTINUOUS_ROTATION_SPEED_FORWARDS);
  } else if (dir_sig == 2) {
     AX(id, CONTINUOUS_ROTATION_SPEED_BACKWARDS);
+ }
+}
+
+// this one allows you to specify a speed for continuous rotation
+void continuousRotationSpeed(int id, int dir_sig, int com) {
+ if(dir_sig == 0) {
+  AX(id, 0);
+ } else if (dir_sig == 1) {
+    AX(id, com);
+ } else if (dir_sig == 2) {
+    AX(id, com);
  }
 }
 
