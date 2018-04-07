@@ -1,1 +1,1 @@
-##Stony Brook RDT: Miscellaneous Mini-Projects
+## Stony Brook RDT: Miscellaneous Mini-Projects
