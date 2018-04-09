@@ -17,12 +17,26 @@
 #define HAND_CLOSE 5 //A/B
 #define CHECKSUM 6 
 
-#define LIN_ACT_1 1 // lower linear actuator
-#define LIN_ACT_2 2 // upper linear actuator
+// byte corresponding to each motor
+#define LIN_ACT_1 1 // shoulder
 #define SERVO_1 3 // vertical
 #define SERVO_2 4 // horizontal
 #define SERVO_3 5 // clamp
+#define SERVO_4 2 // elbow
 
+// ID's of each servo
+#define WRIST_PITCH_ID 1
+#define WRIST_ROTATION_ID 2
+#define HAND_CLOSE_PIN_ID 3
+#define ELBOW_ID 4
+
+// speed of each servo motor
+#define SERVO_1_SPEED 50 // speed of servo one(vertical movement of the claw)
+#define SERVO_2_SPEED 100 // speed of servo two(roatation of the claw)
+#define SERVO_3_SPEED 400 // speed of claw closing
+#define SERVO_4_SPEED 100 // speed of elbow movement
+
+// below is a relic of another idea for contolling the arm, where button data would be processed on the arm
 #define LB 1 // left bumper
 #define LT 2 // left trggier
 #define RB 3 // right bumper
@@ -34,9 +48,6 @@
 #define LEFT_STICK 10 // left stick button
 #define RIGHT_STICK 11 // right stick button
 
-#define SERVO_1_SPEED 50 // speed of servo one(vertical movement of the claw)
-#define SERVO_2_SPEED 100 // speed of servo two(roatation of the claw)
-#define SERVO_3_SPEED 400 // speed of claw closing
 
 /*
  * QUICK AND DIRTY CONTROL SCHEME
@@ -62,15 +73,6 @@
 #define BASE_ARM_SPEED 4
 #define BASE_ARM_DIR1 3
 #define BASE_ARM_DIR2 2
-
-// lin_act 2 (uuper arm)
-#define FOREARM_SPEED 7
-#define FOREARM_DIR1 6
-#define FOREARM_DIR2 5
-
-#define WRIST_PITCH_ID 1
-#define WRIST_ROTATION_ID 2
-#define HAND_CLOSE_PIN_ID 3
 
 #define LINEAR_ACT_MOVESPEED 60
 #define CONTINUOUS_ROTATION_SPEED_FORWARDS 300
@@ -144,17 +146,10 @@ void loop()
       moveLinearAct(BASE_ARM_SPEED, BASE_ARM_DIR1, BASE_ARM_DIR2, 0);
     }
 
-    if (input_data[LIN_ACT_2] == 1) {
-      moveLinearAct(FOREARM_SPEED, FOREARM_DIR1, FOREARM_DIR2, 1);
-    } else if (input_data[LIN_ACT_1] == 2) {
-      moveLinearAct(FOREARM_SPEED, FOREARM_DIR1, FOREARM_DIR2, 2);
-    } else {
-      moveLinearAct(FOREARM_SPEED, FOREARM_DIR1, FOREARM_DIR2, 0);
-    }
-
     continuousRotationSpeed(WRIST_PITCH, input_data[SERVO_1], SERVO_1_SPEED);
     continuousRotationSpeed(WRIST_ROTATION, input_data[SERVO_2], SERVO_2_SPEED);
     continuousRotationSpeed(HAND_CLOSE, input_data[SERVO_3], SERVO_3_SPEED);
+    continuousRotationSpeed(ELBOW_ID, input_data[SERVO_4], SERVO_4_SPEED);
       
       
     } else {
