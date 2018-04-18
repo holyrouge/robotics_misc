@@ -2,13 +2,13 @@
  * SBU Robot Design Team
  * 
  * Implements a way to control MX 12 servo.
- * Hopefully better than quick and dirrty control, but not fully tested yet
+ * Hopefully better than quick and dirty control, but not fully tested yet
  * 
  * Author: Sasha Sokolov and Daniel Moses
  * Date: 4/13/2018                                               PUT RIGHT TIME STAMP
  */
 
-// changed to 8 for intermediate arm control
+// changed to 9 for intermediate arm control
 #define ARM_PACKET_SIZE 8
 #define HEADER 0
 #define BASE_ARM 1 //  left x axis
@@ -16,7 +16,7 @@
 #define VERTICAL 3  // left y axis, elbow or arm depends on LB
 #define WRIST_PITCH 4 // right y axis
 #define WRIST_ROTATION 5 // right x axis
-#define HAND_CONTROL 6 // RB
+#define HAND_CONTROL 6 // X or B
 #define CHECKSUM 7
 
 // byte corresponding to each motor
@@ -101,6 +101,31 @@ void loop()
         //Serial.print(", ");
       }
 
+      // not using the BASE_ARM bit until we actually have a way to rotate the BASE_ARM
+
+      // if LB is pressed, the elbow joint will move, if it is not, the shoulder joint will move
+      if (input_data[VERTICAL_TOGGLE] == 0) {
+        int direction = 0;
+
+        // if the value from the left stick is 127(not moved), the shoulder will not move,
+        // values higher than 127 will make it move forward, lower will make it move backward
+        if (input_data[VERTICAL] == 127) {
+          direction = 0;
+        } else if (input_data[VERTICAL] > 127) {
+          direction = 1
+        } else if (input_data[VERTICAL] < 127) {
+          direction = 2;
+        }
+        
+        moveLinearAct(BASE_ARM_SPEED, BASE_ARM_DIR1, BASE_ARM_DIR2, direction);
+      } else if (input_data[VERTICAL_TOGGLE == 1]) {
+        AX(ELBOW_ID, map(input_data[VERTICAL], 0, 255, 0, 4096));
+      }
+
+      AX(WRIST_PITCH_ID, map(input_data[WRIST_PITCH], 0, 255, 0, 4096));
+      AX(WRIST_ROTATION_ID, map(input_data[WRIST_ROTATION], 0, 255, 0, 4096));
+
+    continuousRotation(HAND_CLOSE_PIN_ID, input_data[HAND_CONTROL]);
 
       
     } else {
