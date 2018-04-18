@@ -88,13 +88,13 @@ void loop()
   }
 
   //We got a full packet
-  if(index == 7) {
+  if(index == ARM_PACKET_SIZE-1) { //0 offset subtract 1
 
     char sum = 0;
-    for(int i = 1; i < 6; i++) {
+    for(int i = 1; i < ARM_PACKET_SIZE-1; i++) { // 1 to 6 if arm packet is 8, 1-6 is data for checksum
       sum+= input_data[i];
     }
-    sum += 0xBB;
+    sum += 0xBB; // Magic number for checksum constant
     if(sum == input_data[CHECKSUM]) {
       for(int i = 0; i < ARM_PACKET_SIZE; i++) {
         //Serial.print((unsigned char)input_data[i]);
