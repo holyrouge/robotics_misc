@@ -73,6 +73,8 @@ int counter = 0;
 
 char input_data[8];
 int index = 0;
+unsigned long lastTime = 0;
+unsigned long currentTime = 0;
 
 
 void setup() {
@@ -80,7 +82,8 @@ void setup() {
   Serial.begin(115200);
   Serial2.begin(9600);
   Serial3.begin(115200); //direct line to radio
-  
+
+  pinMode(LED_BUILTIN, OUTPUT);
   pinMode(dir_1_pin, OUTPUT);
   pinMode(m1_speed_pin, OUTPUT);
   pinMode(dir_2_pin, OUTPUT);
@@ -91,9 +94,13 @@ void setup() {
   pinMode(m4_speed_pin, OUTPUT);
 }
 
+// if no data has been received after three seconds, stop everything (soft kill)
 void read_radio() {
     // put your main code here, to run repeatedly:
+    currentTime = millis();
   if(Serial3.available()) {
+    lastTime = currentTime;
+    digitalWrite(LED_BUILTIN, LOW);
     int data = Serial3.read();
       if(index != 0 && data == 0xFF) {
          //Misaligned... ignore data until we get 0xFF for start of next packet
@@ -107,6 +114,15 @@ void read_radio() {
       input_data[index] = data;
       index++;
     //Serial.println((int) data);
+  } else {
+    if ((currentTime - lastTime) >= 3000) {
+      lastTime = currentTime;
+      digitalWrite(LED_BUILTIN, HIGH);
+      target_speed_1 = 0;
+      target_speed_2 = 0;
+      target_speed_3 = 0;
+      target_speed_4 = 0;
+    }
   }
 
   if(index == 8) {
