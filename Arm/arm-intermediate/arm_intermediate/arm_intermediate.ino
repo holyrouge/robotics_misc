@@ -68,16 +68,25 @@ void setup()
   Serial3.begin(115200);    //RADIO                   
   Serial.begin(115200);
   Serial.flush();
+  Serial.println("Began!");
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 int index = 0;
 char input_data[ARM_PACKET_SIZE];
+unsigned long lastTime = 0;
+unsigned long currentTime = 0;
 
 void loop() 
 {
   //Read from radio
-  if(Serial3.available()) {
+  currentTime = millis();
+  if(Serial3.available() > 0) {
+    lastTime = currentTime;
+    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LED_BUILTIN, HIGH);
     int data = Serial3.read();
+    digitalWrite(LED_BUILTIN, LOW);
       if(index != 0 && data == 0xFF) {
          //Misaligned... ignore data until we get 0xFF for start of next packet
          index = 0;
@@ -89,6 +98,16 @@ void loop()
       }
       input_data[index] = data;
       index++;
+      for (int i = 0; i < ARM_PACKET_SIZE; i++) {
+        Serial.print((int)input_data[i]);
+      }
+      Serial.println();
+  } else {
+    if ((currentTime - lastTime) >= 3000) {
+      lastTime = currentTime;
+      Serial.println("Timeout");
+      digitalWrite(LED_BUILTIN, HIGH);
+    }
   }
 
   //We got a full packet
