@@ -131,12 +131,13 @@ void read_radio() {
 
   if(index == 8) {
 
+  /*
     for (int i = 0; i < 8; i++) {
       Serial.print((int) input_data[i]);
       Serial.print(" ");
     }
     Serial.println();
-
+*/
     char sum = 0;
     for(int i = 1; i < 7; i++) {
       sum+= input_data[i];

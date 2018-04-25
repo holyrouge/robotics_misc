@@ -127,6 +127,7 @@ void loop()
 
       // not using the BASE_ARM bit until we actually have a way to rotate the BASE_ARM
 
+      /*
       // if LB is pressed, the elbow joint will move, if it is not, the shoulder joint will move
       if (input_data[VERTICAL_TOGGLE] == 0) {
         int dir = 0;
@@ -157,12 +158,21 @@ void loop()
 
         moveLinearAct(ELBOW_SPEED, ELBOW_DIR1, ELBOW_DIR2, dir);
       }
+      */
+
+      moveLinearAct(BASE_ARM_SPEED, BASE_ARM_DIR1, BASE_ARM_DIR2, input_data[BASE_ARM]);
+       moveLinearAct(ELBOW_SPEED, ELBOW_DIR1, ELBOW_DIR2, input_data[VERTICAL_TOGGLE]);
 
       // controlling the servos
-      AX(WRIST_PITCH_ID, map(input_data[WRIST_PITCH], 0, 254, 0, 2047));
-      AX(WRIST_ROTATION_ID, map(input_data[WRIST_ROTATION], 0, 254, 0, 2047));
-
-    continuousRotation(HAND_CLOSE_PIN_ID, input_data[HAND_CONTROL]);
+      Serial.print("Wrist_R: ");
+      Serial.println((int)input_data[WRIST_ROTATION]);
+      Serial.print("WRIST_P: ");
+      Serial.println((int)input_data[WRIST_PITCH]);
+      Serial.print("HAND: ");
+      Serial.println((int)input_data[HAND_CONTROL]);
+      AX(WRIST_PITCH_ID,input_data[WRIST_PITCH], 150);
+      AX(WRIST_ROTATION_ID, input_data[WRIST_ROTATION], 200);
+      AX(HAND_CLOSE_PIN_ID, input_data[HAND_CONTROL], 400);
 
       
     } else {
@@ -173,6 +183,7 @@ void loop()
 }
 
 
+/*
 void continuousRotation(int id, int dir_sig) {
  if(dir_sig == 0) {
   AX(id, 0);
@@ -182,7 +193,9 @@ void continuousRotation(int id, int dir_sig) {
     AX(id, CONTINUOUS_ROTATION_SPEED_BACKWARDS);
  }
 }
+*/
 
+/*
 // this one allows you to specify a speed for continuous rotation
 void continuousRotationSpeed(int id, int dir_sig, int com) {
  if(dir_sig == 0) {
@@ -193,6 +206,7 @@ void continuousRotationSpeed(int id, int dir_sig, int com) {
     AX(id, com);
  }
 }
+*/
 
 void moveLinearAct(int speed_pin, int dir1_pin, int dir2_pin, int dir_sig) {
  if(dir_sig == 0) {
@@ -219,9 +233,35 @@ void MX(int id, int com)
 
 //0 to 2047 for speed (0 to 1023 CCW (0 stop, 1023 max speed), 1024 to 2047 CW (1024 stop, 2047 max speed))
 //rotates clockwise or counterclockwise
-void AX(int id, int com)
+void AX(int id, int com, int maxSpeed)
 {
-  byte data[8] = {255, 255, id, 5, 3, 32, lowByte(com), highByte(com)};
+  int set = com ;
+
+  if (set != 0 && set != -127 && set != 127) {
+    set++;
+  }
+
+  if (com < 0) {
+    set = map(set, 0, -127, 0, 0 + maxSpeed);
+    if (set < 30) {
+    set = 0;
+  }
+  } else if (com > 0){
+    set = map(set, 0, 127, 1024, 1024 + maxSpeed);
+    if (set < 1054) {
+    set = 0;
+  }
+  }
+
+  Serial.print("prelim: ");
+  Serial.println(set); 
+  
+
+  
+  
+  Serial.print("set: ");
+  Serial.println(set);
+  byte data[8] = {255, 255, id, 5, 3, 32, lowByte(set), highByte(set)};
   sendData(data, sizeof(data));
 }
 
@@ -234,8 +274,8 @@ void sendData(byte data[], int len)
   }
   Serial1.write(data, len);                     //Sending the data
   Serial1.write(~sum);                          //Sending the checksum
-  Serial1.end();                                //Disabling Serial1 so servo can respond
-  getData();
+  //Serial1.end();                                //Disabling Serial1 so servo can respond
+  //getData();
 }
 void getData()
 {
@@ -244,7 +284,7 @@ void getData()
   {
     Serial.println(Serial2.read());             //Reading echo
   }
-  //while(!Serial2.available()){}                 //Waiting for status packet
+  while(!Serial2.available()){}                 //Waiting for status packet
   while(Serial2.available())
   {
     Serial.println(Serial2.read());             //Reading status packet
