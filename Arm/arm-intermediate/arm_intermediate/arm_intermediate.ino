@@ -98,10 +98,7 @@ void loop()
       }
       input_data[index] = data;
       index++;
-      for (int i = 0; i < ARM_PACKET_SIZE; i++) {
-        Serial.print((int)input_data[i]);
-      }
-      Serial.println();
+     
   } else {
     if ((currentTime - lastTime) >= 3000) {
       lastTime = currentTime;
@@ -111,18 +108,22 @@ void loop()
   }
 
   //We got a full packet
-  if(index == ARM_PACKET_SIZE-1) { //0 offset subtract 1
+  if(index == ARM_PACKET_SIZE) { //0 offset subtract 1
 
     char sum = 0;
     for(int i = 1; i < ARM_PACKET_SIZE-1; i++) { // 1 to 6 if arm packet is 8, 1-6 is data for checksum
       sum+= input_data[i];
     }
     sum += 0xBB; // Magic number for checksum constant
+    Serial.print("Checksum: ");
+    Serial.println((int) sum);
     if(sum == input_data[CHECKSUM]) {
-      for(int i = 0; i < ARM_PACKET_SIZE; i++) {
-        //Serial.print((unsigned char)input_data[i]);
-        //Serial.print(", ");
+
+       for (int i = 0; i < ARM_PACKET_SIZE; i++) {
+        Serial.print((int)input_data[i]);
+        Serial.print(" ");
       }
+      Serial.println();
 
       // not using the BASE_ARM bit until we actually have a way to rotate the BASE_ARM
 
@@ -132,9 +133,9 @@ void loop()
 
         // if the value from the left stick is 127(not moved), the shoulder will not move,
         // values higher than 127 will make it move forward, lower will make it move backward
-        if (input_data[VERTICAL] == 127) {
+        if (input_data[VERTICAL] == 0) {
           dir = 0;
-        } else if (input_data[VERTICAL] > 127) {
+        } else if (input_data[VERTICAL] > -127) {
           dir = 1;
         } else if (input_data[VERTICAL] < 127) {
           dir = 2;
@@ -146,9 +147,9 @@ void loop()
 
         // if the value from the left stick is 127(not moved), the shoulder will not move,
         // values higher than 127 will make it move forward, lower will make it move backward
-        if (input_data[VERTICAL] == 127) {
+        if (input_data[VERTICAL] == 0) {
           dir = 0;
-        } else if (input_data[VERTICAL] > 127) {
+        } else if (input_data[VERTICAL] > -127) {
           dir = 1;
         } else if (input_data[VERTICAL] < 127) {
           dir = 2;
@@ -158,14 +159,14 @@ void loop()
       }
 
       // controlling the servos
-      AX(WRIST_PITCH_ID, map(input_data[WRIST_PITCH], 0, 254, 0, 4096));
-      AX(WRIST_ROTATION_ID, map(input_data[WRIST_ROTATION], 0, 254, 0, 4096));
+      AX(WRIST_PITCH_ID, map(input_data[WRIST_PITCH], 0, 254, 0, 2047));
+      AX(WRIST_ROTATION_ID, map(input_data[WRIST_ROTATION], 0, 254, 0, 2047));
 
     continuousRotation(HAND_CLOSE_PIN_ID, input_data[HAND_CONTROL]);
 
       
     } else {
-      //Serial.println("checksum fail");
+      Serial.println("checksum fail");
     }
     index = 0;
   }
@@ -238,15 +239,19 @@ void sendData(byte data[], int len)
 }
 void getData()
 {
+  
   while(Serial2.available())
   {
     Serial.println(Serial2.read());             //Reading echo
   }
-  while(!Serial2.available()){}                 //Waiting for status packet
+  //while(!Serial2.available()){}                 //Waiting for status packet
   while(Serial2.available())
   {
     Serial.println(Serial2.read());             //Reading status packet
   }
-  Serial.println();
+  
+ Serial.println();
+  
   Serial1.begin(1000000);                       //Preparing Serial1 pin with baud rate of 1000000
+  
 }

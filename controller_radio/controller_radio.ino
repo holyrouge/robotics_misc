@@ -101,7 +101,9 @@ void read_radio() {
   if(Serial3.available()) {
     lastTime = currentTime;
     digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(LED_BUILTIN, HIGH);
     int data = Serial3.read();
+    digitalWrite(LED_BUILTIN, LOW);
       if(index != 0 && data == 0xFF) {
          //Misaligned... ignore data until we get 0xFF for start of next packet
          index = 0;
@@ -114,6 +116,7 @@ void read_radio() {
       input_data[index] = data;
       index++;
     //Serial.println((int) data);
+    
   } else {
     if ((currentTime - lastTime) >= 3000) {
       lastTime = currentTime;
@@ -122,10 +125,17 @@ void read_radio() {
       target_speed_2 = 0;
       target_speed_3 = 0;
       target_speed_4 = 0;
+      Serial.println("Timeout");
     }
   }
 
   if(index == 8) {
+
+    for (int i = 0; i < 8; i++) {
+      Serial.print((int) input_data[i]);
+      Serial.print(" ");
+    }
+    Serial.println();
 
     char sum = 0;
     for(int i = 1; i < 7; i++) {
