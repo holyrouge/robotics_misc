@@ -37,7 +37,7 @@ OneWire ds(DS18S20_Pin);  // on digital pin 4
 
 
 //PIN for LEDs
-#define PIN 6 
+#define PIN 5 
 
 
 int NUM_LEDS = 150;
