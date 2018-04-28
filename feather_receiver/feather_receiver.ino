@@ -1,3 +1,5 @@
+// #include <SoftwareSerial.h>
+
 // Feather9x_RX
 
 // -*- mode: C++ -*-
@@ -118,6 +120,8 @@ RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
 #define LED 13
 
+// SoftwareSerial mySerial(4, 6);
+
 // initialize serial and radio
 void setup()
 
@@ -132,6 +136,7 @@ void setup()
   delay(100);
 
   Serial1.begin(115200);
+  // mySerial.begin(115200);
 
   digitalWrite(RFM95_RST, LOW);
 
@@ -223,6 +228,7 @@ void printData(const char *buf, uint8_t len)
   {
 
     Serial1.print(buf[i]);
+    // mySerial.print(buf[i]);
   }
 
 #endif

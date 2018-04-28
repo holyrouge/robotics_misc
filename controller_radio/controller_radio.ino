@@ -118,7 +118,7 @@ void read_radio() {
     //Serial.println((int) data);
     
   } else {
-    if ((currentTime - lastTime) >= 3000) {
+    if ((currentTime - lastTime) >= 2000) {
       lastTime = currentTime;
       digitalWrite(LED_BUILTIN, HIGH);
       target_speed_1 = 0;
@@ -138,6 +138,7 @@ void read_radio() {
     }
     Serial.println();
 */
+    // Serial3.flush();
     char sum = 0;
     for(int i = 1; i < 7; i++) {
       sum+= input_data[i];
