@@ -17,3 +17,5 @@ python pano.py \<path to input directory> \<path to output directory>
 #### Requirements
 * python 3.6.4
 * opencv 3.4.1
+#### Reference
+* https://www.pyimagesearch.com/2016/01/11/opencv-panorama-stitching/
