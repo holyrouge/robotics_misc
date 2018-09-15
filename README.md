@@ -1,1 +1,1 @@
-## Stony Brook RDT: Miscellaneous Mini-Projects
+## SBRT: Miscellaneous Mini-Projects
