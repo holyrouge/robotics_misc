@@ -1,3 +1,11 @@
+/*
+Last Updated: Spring 2018
+Created By: Prangon Ghose
+
+Purpose: This program controls a servo through an Arduino Uno 
+to turn the Zed camera in 180 degree rotations.
+*/
+
 #include <Servo.h>
 
 void turnservo();
