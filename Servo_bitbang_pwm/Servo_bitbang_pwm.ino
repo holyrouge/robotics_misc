@@ -14,7 +14,7 @@ void setup()
   for(int i=0; i<70; i++) //50 pulses are about right to make sure that the servo goes to the given position (actual value should be measured)
   {
     digitalWrite(servo_pin, HIGH); //on
-    delayMicroseconds(commandPulse); //the command pulse nust be a min of 1ms (0 degrees), and 2ms (180 degrees)
+    delayMicroseconds(commandPulse); //the command pulse must be a min of 1ms (0 degrees), and 2ms (180 degrees)
     digitalWrite(servo_pin, LOW); //off
     delayMicroseconds(20000 - commandPulse); //servo period should be 20ms 
   }
