@@ -41,15 +41,15 @@ NMEA2=GPS.lastNMEA();
   //Serial.println(NMEA1);
  // Serial.println(NMEA2);
   Serial.print(GPS.latitude,4); //Write measured latitude to file
-  Serial.print(GPS.lat); //Which hemisphere N or S
-  Serial.print(" ");
+  //Serial.print(GPS.lat); //Which hemisphere N or S
+  Serial.print("  ");
   Serial.print(GPS.longitude,4); //Write measured longitude to file
-  Serial.print(GPS.lon); //Which Hemisphere E or W
-  Serial.print(" ");
+  //Serial.print(GPS.lon); //Which Hemisphere E or W
+  Serial.print("  ");
   Serial.print(GPS.altitude);
   Serial.print("  ");
   Serial.print(GPS.speed);
-  Serial.print(" ");
+  //Serial.print(" ");
   Serial.println();
 
 }

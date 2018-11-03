@@ -19,9 +19,9 @@ while True:
     line = ser.readline();
     line = line.decode("ANSI") #ser.readline returns a binary, convert to string
     line = line.replace('N', ' ')
-    line = line.replace('W', ' ')
+    line = line.replace("W", ' ')
     print(line)
-    if len(line) >= 31:
+    if len(line) >= 20:
         output_file.write(line)
 
 
