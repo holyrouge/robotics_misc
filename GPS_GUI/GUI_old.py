@@ -36,8 +36,12 @@ ax.set_xlim([0,10000])
 
 count = 0
 
-xtemp = 0  # old values of x and y for the rover is stored here while the rover clears the plot and waits for new point
-ytemp = 0  # could do this for objective points too, probably should at some point with an array for obj pts.
+xtemp = 0     # old values of x, y, speed and altitude for the rover is stored here while the rover clears
+
+ytemp = 0     # the plot and waits for new point. could do this for objective points too, probably should at some
+altitude = 0  # point with an array for obj pts.
+speed = 0
+
 
 objPtTempX= [0, 0, 0, 0, 0, 0]      # May use these arrays at some point to draw dotted lines from the rover
 objPtTempY = [0, 0, 0, 0, 0, 0]     # location to each objective points (haven't done yet)
@@ -78,7 +82,7 @@ def input_lat_and_long(lat, long):
     objPtTempX.append(long)
     objPtTempY.append(lat)
 
-    objpt = ax.scatter(xList, yList, color=color_string)
+    objpt = ax.scatter(xList, yList, color=color_string, s=50)
     objpt
 
 def connectpoints(x,y,p1,p2):
@@ -90,24 +94,30 @@ def animate(self):  # function for animating the GPS coordinate movement
     global count
     #ax.imshow(img, extent=[0, 10000, 0, 10000])
 
-    pullData = open("/Users/Sean/Documents/newOutput1.dat", "r").read()
+    pullData = open("/Users/Sean/Documents/newOutput1.txt", "r").read()
     dataList = pullData.split('\n')
     xList1 = []
     yList1 = []
+    altList1 = []
+    speedList1 = []
 
     global xtemp
     global ytemp
+    global altitude
+    global speed
 
     for eachLine in dataList:
         if len(eachLine) > 1:
             x, y, z, z2 = eachLine.split('  ')
             xList1.append(float(x))
             yList1.append(float(y))
+            altList1.append(float(z))
+            speedList1.append(float(z2))
             xtemp = float(x)
             ytemp = float(y)
-
-    paths = ax.scatter(xList1, yList1, color="white")
-
+            altitude = float(altitude)
+            speed = float(speed)
+    paths = ax.scatter(xList1, yList1, s = 100, color="white")
     paths
 
     global color_count
@@ -122,24 +132,37 @@ def animate(self):  # function for animating the GPS coordinate movement
         ax.set_xlim([0, 10000])
         ax.scatter(xtemp,ytemp, color="white")
 
-        pt1Stats = objPtStats(pointStatsFrame, 1, float(obj_pt1.x_entry.get()), float(obj_pt1.y_entry.get()), xtemp,
-                              ytemp,
-                              0, 1, "#42DAED")
-        pt2Stats = objPtStats(pointStatsFrame, 2, float(obj_pt2.x_entry.get()), float(obj_pt2.y_entry.get()), xtemp,
-                              ytemp,
-                              1*4, 1, "blue")
-        pt3Stats = objPtStats(pointStatsFrame, 3, float(obj_pt3.x_entry.get()), float(obj_pt3.y_entry.get()), xtemp,
-                              ytemp,
-                              2 * 4, 1, "red")
-        pt4Stats = objPtStats(pointStatsFrame, 4, float(obj_pt4.x_entry.get()), float(obj_pt4.y_entry.get()), xtemp,
-                              ytemp,
-                              3 * 4, 1, "purple")
-        pt5Stats = objPtStats(pointStatsFrame, 5, float(obj_pt5.x_entry.get()), float(obj_pt5.y_entry.get()), xtemp,
-                              ytemp,
-                              4 * 4, 1, "orange")
-        pt6Stats = objPtStats(pointStatsFrame, 6, float(obj_pt6.x_entry.get()), float(obj_pt6.y_entry.get()), xtemp,
-                              ytemp,
-                              5 * 4, 1, "#0AF524")
+        if(is_number(obj_pt1.x_entry.get()) and is_number(obj_pt1.y_entry.get())):
+            pt1Stats = objPtStats(pointStatsFrame, 1, float(obj_pt1.x_entry.get()), float(obj_pt1.y_entry.get()), xtemp,
+                                  ytemp,
+                                  0, 1, "#42DAED")
+        if (is_number(obj_pt2.x_entry.get()) and is_number(obj_pt2.y_entry.get())):
+
+            pt2Stats = objPtStats(pointStatsFrame, 2, float(obj_pt2.x_entry.get()), float(obj_pt2.y_entry.get()), xtemp,
+                                  ytemp,
+                                  1*4, 1, "blue")
+        if (is_number(obj_pt3.x_entry.get()) and is_number(obj_pt3.y_entry.get())):
+
+            pt3Stats = objPtStats(pointStatsFrame, 3, float(obj_pt3.x_entry.get()), float(obj_pt3.y_entry.get()), xtemp,
+                                  ytemp,
+                                  2 * 4, 1, "red")
+        if (is_number(obj_pt4.x_entry.get()) and is_number(obj_pt4.y_entry.get())):
+
+            pt4Stats = objPtStats(pointStatsFrame, 4, float(obj_pt4.x_entry.get()), float(obj_pt4.y_entry.get()), xtemp,
+                                  ytemp,
+                                  3 * 4, 1, "purple")
+        if (is_number(obj_pt5.x_entry.get()) and is_number(obj_pt5.y_entry.get())):
+
+            pt5Stats = objPtStats(pointStatsFrame, 5, float(obj_pt5.x_entry.get()), float(obj_pt5.y_entry.get()), xtemp,
+                                  ytemp,
+                                  4 * 4, 1, "orange")
+        if (is_number(obj_pt6.x_entry.get()) and is_number(obj_pt6.y_entry.get())):
+
+            pt6Stats = objPtStats(pointStatsFrame, 6, float(obj_pt6.x_entry.get()), float(obj_pt6.y_entry.get()), xtemp,
+                                  ytemp,
+                                  5 * 4, 1, "#0AF524")
+
+        roverStats(roverStatsFrame, speed, altitude, 2, 1)
 
     obj_pt1.button.invoke()
     color_count = 1
@@ -155,6 +178,20 @@ def animate(self):  # function for animating the GPS coordinate movement
     color_count = 6
 
 
+def is_number(s):    #  imported a function to test if the values in the coordinate entries are actually numbers,
+    try:             #  and not empty entried or entries with other symbols (e.g. $%@$^&\/!)
+        float(s)     #  If an entry contains anything other than a number, the program ordinarily freezes so this
+        return True  # is used for exception handling
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+    return False
 
 
 class obj_pt_set:
@@ -185,22 +222,46 @@ class objPtStats:
     def __init__(self, frame, pointNum, xCoordPt, yCoordPt, xCoordRover, yCoordRover, rowN, columnN, color_picked):
         idealAngle = 0
         eucDist = 0
-        if(float(xCoordPt) >=0 and float(xCoordRover)>=0 and float(yCoordPt)>0 and float(yCoordRover)>=0):
-            idealAngle = math.atan((yCoordPt-yCoordRover)/(xCoordPt-xCoordRover)) * (180/3.14159)
-            idealAngle = round(idealAngle, 2)
+        xCoordPt = float(xCoordPt)
+        yCoordPt = float(yCoordPt)
+        xCoordRover = float(xCoordRover)
+        yCoordRover = float(yCoordRover)
+        if( (xCoordPt != xCoordRover) and (yCoordPt!= yCoordRover)):
+            if(is_number(xCoordPt) and is_number(xCoordRover) and (yCoordPt) and is_number(yCoordRover)):
 
-            eucDist = math.sqrt(((xCoordPt-xCoordRover)*(xCoordPt-xCoordRover) + (yCoordPt-yCoordRover)*yCoordPt-yCoordRover))
-            eucDist = round(eucDist, 2)
+                if((xCoordPt-xCoordRover) > 0 and (yCoordPt - yCoordRover) > 0):
+                    idealAngle = math.atan((float(xCoordPt)-float(xCoordRover))/(float(yCoordPt)-float(yCoordRover))) * (180/3.14159)
 
-        self.textLabel = Label(frame, text=("P" + str(pointNum)), bg = color_picked)
-        self.distToRover = Label(frame, text = eucDist, bg = color_picked)
-        self.idealAngle =  Label(frame, text = ("ideal ∠: " + str(idealAngle)), bg = color_picked)
+                if((xCoordPt-xCoordRover) > 0 and (yCoordPt - yCoordRover) < 0):
+                    idealAngle = 180 - abs(math.atan((float(xCoordPt)-float(xCoordRover))/(float(yCoordPt)-float(yCoordRover))) * (180/3.14159))
+
+                if((xCoordPt-xCoordRover) < 0 and (yCoordPt - yCoordRover) > 0):
+                    idealAngle = math.atan((float(xCoordPt)-float(xCoordRover))/(float(yCoordPt)-float(yCoordRover))) * (180/3.14159)
+
+                if((xCoordPt-xCoordRover) < 0 and (yCoordPt - yCoordRover) < 0):
+                    idealAngle = -180 + abs(math.atan((float(xCoordPt)-float(xCoordRover))/(float(yCoordPt)-float(yCoordRover))) * (180/3.14159))
+
+
+                idealAngle = round(idealAngle, 2)
+                eucDist = math.sqrt((abs((xCoordPt-xCoordRover)*abs(xCoordPt-xCoordRover)) + abs((yCoordPt-yCoordRover)* abs(yCoordPt-yCoordRover))))
+                eucDist = round(eucDist, 2)
+
+        self.textLabel = Label(frame, text=("P" + str(pointNum)), bg = color_picked, fg="white")
+        self.distToRover = Label(frame, text = eucDist, bg = color_picked, fg="white")
+        self.idealAngle = Label(frame, text = ("ideal ∠: " + str(idealAngle)), bg = color_picked, fg="white")
 
 
         self.textLabel.grid(row=rowN, column=columnN)
         self.distToRover.grid(row=rowN+1, column=columnN)
         self.idealAngle.grid(row=rowN+2, column=columnN, pady=5)
+        tkinter.ttk.Separator(frame, orient=HORIZONTAL).grid(column=columnN, row=rowN+3, columnspan=2, sticky='ew')
 
+class roverStats:
+    def __init__(self, frame, speed, altitude, rowN, columnN):
+        self.speed_label = Label(frame, text = ("speed (km/h): " + str(speed)), bg = "grey")
+        self.altitude_label = Label(frame, text = "altitude: " + str(altitude), bg = "grey")
+        self.speed_label.grid(row=rowN, column=columnN)
+        self.altitude_label.grid(row=rowN+1, column=columnN)
 
 
 def pressButtons(self):
@@ -209,7 +270,6 @@ def pressButtons(self):
 root = Tk()
 root.geometry("1400x800")
 
-
 root.configure(bg="#404040")
 
 myCanvas = Canvas(root, width=640, height=480, borderwidth=3, highlightbackground="white", highlightthickness=3)
@@ -217,7 +277,9 @@ myFrame = Frame(root, borderwidth=10, width=1000, height=240, bg="grey")
 myFrame.config(highlightbackground="black", highlightthickness=5)
 myCanvas2 = Canvas(root, width=360, height=240, bg="#508AAF")
 myCanvas3 = Canvas(root, width=360, height=240, bg="#A18D5E")
-pointStatsFrame = Canvas(root, width=190, height=480, bg="grey")
+pointStatsFrame = Canvas(root, width=240, height=480, bg="black")
+roverStatsFrame = Canvas(root, width = 190, height = 190, bg = "grey")
+
 myGraph = FigureCanvasTkAgg(f, master=myCanvas)
 myGraph.get_tk_widget().pack(side="top", fill='both', expand=True)
 
@@ -253,11 +315,14 @@ pt6Stats = objPtStats(pointStatsFrame, 6, float(obj_pt6.x_entry.get()), float(ob
                       ytemp,
                       5 * 4, 1, "#0AF524")
 
+add_rover_stats = roverStats(roverStatsFrame, speed, altitude, 2, 1)
+
 myCanvas.grid(row=0, column=0, columnspan=2, rowspan=2)
-pointStatsFrame.grid(row=0, column=2, rowspan=2, columnspan=1, padx=4, pady=4)
+pointStatsFrame.grid(row=0, column=2, rowspan=2, columnspan=2, padx=4, pady=4, sticky="ns")
 myFrame.grid(row=2, column=0, columnspan=1)
-myCanvas2.grid(row=0, column=3)
-myCanvas3.grid(row=1, column=3)
+roverStatsFrame.grid(row=2, column=1)
+myCanvas2.grid(row=0, column=4)
+myCanvas3.grid(row=1, column=4)
 
 ani = animation.FuncAnimation(f, animate, interval=100)
 
