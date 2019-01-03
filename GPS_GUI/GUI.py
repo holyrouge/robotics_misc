@@ -1,4 +1,6 @@
 from tkinter import *
+import tkinter as tk
+import tkinter.ttk as ttk
 import tkinter.ttk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
@@ -9,13 +11,16 @@ from matplotlib import style
 import math
 
 
-f = Figure(figsize = (5, 5),dpi=100)
+f = Figure(figsize=(5, 5),dpi=100)
 matplotlib.style.use('dark_background')
 
 img = plt.imread("hanksville_edit.png")
 
-f, ax = plt.subplots() #adding a subplot to figure f
+f, ax = plt.subplots()  # adding a figure 'f' and adding a subplot 'ax' to it
 f.add_subplot(111, frameon=False)
+
+f2 = plt.Figure(figsize=(5, 5), dpi=100) # for use in the graphs page
+
 plt.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
 plt.grid(False)
 plt.xlabel("LONGITUDE (E/W)")
@@ -48,7 +53,7 @@ theta = 0      # instantaneous angle of movement on the rover (not inputted from
 objPtTempX= [0, 0, 0, 0, 0, 0]      # May use these arrays at some point to draw dotted lines from the rover
 objPtTempY = [0, 0, 0, 0, 0, 0]     # location to each objective points (haven't done yet)
 
-
+graph_page_clicked = False
 
 def input_lat_and_long(lat, long):
     xList = []
@@ -87,14 +92,10 @@ def input_lat_and_long(lat, long):
     objpt = ax.scatter(xList, yList, color=color_string, s=50)
     objpt
 
-def connectpoints(x,y,p1,p2):
-    x1, x2 = x[p1], x[p2]
-    y1, y2 = y[p1], y[p2]
-    plt.plot([x1,x2],[y1,y2],'k-')
+
 
 def animate(self):  # function for animating the GPS coordinate movement
     global count
-    #ax.imshow(img, extent=[0, 10000, 0, 10000])
 
     pullData = open("/Users/Sean/Documents/newOutput1.dat", "r").read()
     dataList = pullData.split('\n')
@@ -140,15 +141,13 @@ def animate(self):  # function for animating the GPS coordinate movement
                         theta = -180 + abs(math.atan(
                             (float(x) - float(xtemp)) / (float(y) - float(ytemp))) * (
                                                             180/3.14159))
-           # else:
-             #   theta = 5
 
             theta = round(theta, 2)
             xtemp = float(x)    # storing the old value of x for later comparison w/ new values of x
             ytemp = float(y)    # storing the old value of y for later comparison w/ new values of y
             altitude = float(z)     # storing altitude
             speed = float(z2) * 1.852   # z2 = speed which is multiplied by 1.852 to get in km/hr instead of knots
-    paths = ax.scatter(xList1, yList1, s = 100, color="white")  # plotting the longitude and latitude
+    paths = ax.scatter(xList1, yList1, s=100, color="white")  # plotting the longitude and latitude
     paths
 
     global color_count
@@ -216,9 +215,9 @@ def animate(self):  # function for animating the GPS coordinate movement
 
 
 def is_number(s):    #  imported a function to test if the values in the coordinate entries are actually numbers,
-    try:             #  and not empty entried or entries with other symbols (e.g. $%@$^&\/!)
+    try:             #  and not empty entries or entries with other symbols (e.g. $%@$^&\/!)
         float(s)     #  If an entry contains anything other than a number, the program ordinarily freezes so this
-        return True  # is used for exception handling
+        return True  # is used to handle such cases
     except ValueError:
         pass
 
@@ -234,17 +233,17 @@ def is_number(s):    #  imported a function to test if the values in the coordin
 class obj_pt_set:
     def __init__(self, theFrame, title, rowN, columnN, color_picked):
 
-        self.textLabel = Label(theFrame, text=title, bg = color_picked, fg = "white")
+        self.textLabel = Label(theFrame, text=title, bg=color_picked, fg="white")
 
         self.x_entry = Entry(theFrame)
-        self.x_entry_title = Label(theFrame, text="x: ", bg = color_picked, fg = "white")
+        self.x_entry_title = Label(theFrame, text="x: ", bg=color_picked, fg="white")
         self.x_entry.insert(0, "0")
 
         self.y_entry = Entry(theFrame)
-        self.y_entry_title = Label(theFrame, text="y: ", bg = color_picked, fg="white")
+        self.y_entry_title = Label(theFrame, text="y: ", bg=color_picked, fg="white")
         self.y_entry.insert(0, "0")
 
-        self.button = Button(theFrame, text="Submit", command= lambda:input_lat_and_long(self.y_entry.get(), self.x_entry.get()))
+        self.button = Button(theFrame, text="Submit", command=lambda: input_lat_and_long(self.y_entry.get(), self.x_entry.get()))
 
         self.textLabel.grid(row=rowN, column=columnN, columnspan=2,  padx=5, pady=5)
 
@@ -278,16 +277,12 @@ class objPtStats:
                 if((xCoordPt-xCoordRover) < 0 and (yCoordPt - yCoordRover) < 0):
                     idealAngle = -180 + abs(math.atan((float(xCoordPt)-float(xCoordRover))/(float(yCoordPt)-float(yCoordRover))) * (180/3.14159))
 
-
                 idealAngle = round(idealAngle, 2)
-
 
                 roverXKM = long_to_KM(xCoordRover)
                 roverYKM = lat_to_KM(yCoordRover)
                 ptXKM = long_to_KM(xCoordPt)
                 ptYKM = lat_to_KM(yCoordPt)
-
-
 
                 eucDist = math.sqrt((abs((ptXKM-roverXKM)*abs(ptXKM-roverXKM)) + abs((ptYKM-roverYKM)* abs(ptYKM-roverYKM))))
                 eucDist = round(eucDist, 2)
@@ -316,13 +311,9 @@ class roverStats:
         self.altitude_label.grid(row=rowN+2, column=columnN)
 
 
-def pressButtons(self):
-    self.button.invoke()
-
-
-def lat_to_KM(a):
+def lat_to_KM(a):  # converts the latitudinal units to kilometers (called by the ObjPtStats class)
     a = abs(a) * 10000
-    aNum1 = a / 10000000;
+    aNum1 = a / 10000000
     aNum2 = (a % 10000000) / 1000000
     aNum3 = (a % 1000000) / 100000
     aNum4 = (a % 100000) / 10000
@@ -333,10 +324,10 @@ def lat_to_KM(a):
     aDeg = 10 * aNum1 + aNum2
     aMin = 10 * aNum3 + aNum4 + 0.1 * aNum5 + 0.01 * aNum6 + 0.001 * aNum7 + 0.0001 * aNum8
     aTotal = (111*aDeg + (111/60)*aMin)
-
     return aTotal
 
-def long_to_KM(a):
+
+def long_to_KM(a):  # converts the longitudinal units to kilometers (called by the ObjPtStats class)
     a = abs(a) * 10000
     aNum1 = a / 10000000
     aNum2 = (a % 10000000) / 1000000
@@ -349,8 +340,8 @@ def long_to_KM(a):
     aDeg = 10 * aNum1 + aNum2
     aMin = 10 * aNum3 + aNum4 + 0.1 * aNum5 + 0.01 * aNum6 + 0.001 * aNum7 + 0.0001 * aNum8
     aTotal = (84*aDeg + (84/60)* aMin)
-
     return aTotal
+
 
 class setDimensions:
     def __init__(self, frame, rowN, columnN):
@@ -367,6 +358,12 @@ class setDimensions:
 
         self.highY_label = Label(frame, text="max Lat: ", bg="grey")
         self.highY = Entry(frame)
+
+        self.emergency_label = Label(frame, text = "EMERGENCY RESET:")
+        self.emergency_button = Button(frame, text="CLICK ME!", command = lambda:set_bg_pringle())
+
+        self.graph_page_label = Label(frame, text = "Open Graphs")
+        self.graph_page_button = Button(frame, text = "open", command = lambda: open_scientific_graphs())
 
         if(count1==0):
             self.lowX.insert(0, "0")
@@ -387,7 +384,22 @@ class setDimensions:
         self.highY_label.grid(row=rowN+3, column=columnN)
         self.highY.grid(row=rowN+3, column=columnN+1)
 
+        self.emergency_label.grid(row=rowN+4, column=columnN)
+        self.emergency_button.grid(row=rowN+5, column=columnN)
 
+        self.graph_page_label.grid(row=rowN+4, column=columnN+1)
+        self.graph_page_button.grid(row=rowN+5, column=columnN+1)
+
+
+def set_bg_pringle():
+    global img
+    img = plt.imread("prangface.png")
+
+
+def open_scientific_graphs():
+    new_page = tk.Toplevel()
+    app = graphPage(new_page)
+    ani2 = animation.FuncAnimation(f2, animate, interval=200)
 
 
 def apply_dims(lowX, lowY, highX, highY):
@@ -400,10 +412,28 @@ def apply_dims(lowX, lowY, highX, highY):
         ax.set_xlim([lowX, highX])
 
 
+class graphPage:
+    def __init__(self, master):
+        self.master = master
+        self.canvas = Canvas(self.master, width=800, height=500)
+
+        global f2
+        ax2 = f2.add_subplot(221)
+        ax2.autoscale(True)
+        ax2.set_ylim([0, 10])
+        ax2.set_xlim([0, 10])
+        ax2.plot([1, 2, 3, 4, 5, 6, 7, 8], [5, 6, 1, 3, 8, 9, 3, 5])
+
+        ax3 = f2.add_subplot(222)
+        ax4 = f2.add_subplot(223)
+        ax5 = f2.add_subplot(224)
+
+        myGraph2 = FigureCanvasTkAgg(f2, master=master)
+        myGraph2.get_tk_widget().pack(side="top", fill='both', expand=True)
+
 
 root = Tk()
 root.geometry("1400x800")
-
 root.configure(bg="#404040")
 
 myCanvas = Canvas(root, width=640, height=480, borderwidth=3, highlightbackground="white", highlightthickness=3)
@@ -458,7 +488,6 @@ myFrame.grid(row=3, column=0, columnspan=3)
 roverStatsFrame.grid(row=2, column=3, columnspan=1, padx=4, pady=4, sticky="nsew")
 myCanvas2.grid(row=0, column=4)
 myCanvas3.grid(row=2, column=4)
-
-ani = animation.FuncAnimation(f, animate, interval=100)
+ani = animation.FuncAnimation(f, animate, interval=200)
 
 root.mainloop()
